@@ -19,13 +19,13 @@ public class PostMessageService {
         HttpClient client = HttpClient.newHttpClient();
 
         SlackResponse slackResponse = new SlackResponse(
-                "xoxb-1467349419936-1452029906275-sceI9FzUJPI3ZGwzKBUkTQeq",
+                System.getenv("BOT_TOKEN"),
                 "Well done son!",
                 "nothing");
 
         // create a request
         HttpRequest request = HttpRequest.newBuilder(
-                URI.create("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY"))
+                URI.create(API_URL))
                 .header("accept", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofByteArray(SerializationUtils.serialize(slackResponse)))
                 .build();
