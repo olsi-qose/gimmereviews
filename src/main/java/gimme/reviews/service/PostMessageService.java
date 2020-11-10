@@ -1,43 +1,67 @@
 package gimme.reviews.service;
 
-import gimme.reviews.model.SlackResponse;
-import org.springframework.util.SerializationUtils;
+import com.slack.api.Slack;
+import com.slack.api.methods.MethodsClient;
+import com.slack.api.methods.SlackApiException;
+import com.slack.api.methods.request.chat.ChatPostMessageRequest;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
+import gimme.reviews.model.Review;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
-
+@Service
 public class PostMessageService {
 
-    final String API_URL = "https://slack.com/api";
+    private String token = "xoxb-1467349419936-1452029906275-K8JvcSs016XLwskPxkiPP6Rl";
 
-    public void sendResponseMessage(String msg)  {
-        // create a client
-        HttpClient client = HttpClient.newHttpClient();
+    public void sendResponseMessage(String errorMessage)  {
 
-        SlackResponse slackResponse = new SlackResponse(
-                System.getenv("BOT_TOKEN"),
-                "Well done son!",
-                "nothing");
+        Slack slack = Slack.getInstance();
 
-        // create a request
-        HttpRequest request = HttpRequest.newBuilder(
-                URI.create(API_URL))
-                .header("accept", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofByteArray(SerializationUtils.serialize(slackResponse)))
+        // Initialize an API Methods client with the given token
+        MethodsClient methods = slack.methods(token);
+
+        // Build a request object
+        ChatPostMessageRequest request = ChatPostMessageRequest.builder()
+                .channel("#nothing") // Use a channel ID `C1234567` is preferrable
+                .text(errorMessage)
                 .build();
 
-        // use the client to send the request
-        HttpResponse<String> response = null;
         try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
+            // Get a response as a Java object
+            ChatPostMessageResponse response = methods.chatPostMessage(request);
+            System.out.println(response.toString());
+        } catch (IOException | SlackApiException e) {
             e.printStackTrace();
         }
+    }
 
+    public void sendResponseMessage(Review review)  {
+
+        Slack slack = Slack.getInstance();
+
+        // Initialize an API Methods client with the given token
+        MethodsClient methods = slack.methods(token);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(":fire: Found reviews for given url! ")
+                .append("Reviews: ").append(review.getReview()).append(" ")
+                .append("Rating: ").append(review.getRating());
+
+        // Build a request object
+        ChatPostMessageRequest request = ChatPostMessageRequest.builder()
+                .channel("#nothing") // Use a channel ID `C1234567` is preferrable
+                .text(stringBuilder.toString())
+                .build();
+
+        try {
+            // Get a response as a Java object
+            ChatPostMessageResponse response = methods.chatPostMessage(request);
+            System.out.println(response.toString());
+        } catch (IOException | SlackApiException e) {
+            e.printStackTrace();
+        }
     }
 
 }

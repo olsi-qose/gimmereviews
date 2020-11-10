@@ -1,32 +1,36 @@
 package gimme.reviews.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
+import com.slack.api.model.event.MessageEvent;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class SlackMessage {
 
-    private String token;
-    private String challenge;
-    private String type;
-    private Event event;
+    private final String token;
+    private final String challenge;
+    private final String type;
+    private final MessageEvent event;
 
+    @JsonCreator
     public SlackMessage(
             @JsonProperty("token") String token,
             @JsonProperty("challenge") String challenge,
-            @JsonProperty("event") @JsonSetter(nulls = Nulls.SKIP) Event event,
+            @JsonProperty("event")
+            @JsonSetter(nulls = Nulls.SKIP) MessageEvent event,
             @JsonProperty("type") String type) {
         this.token = token;
         this.challenge = challenge;
         this.type = type;
-    }
-
-    public Event getEvent() {
-        return event;
-    }
-
-    public void setEvent(Event event) {
         this.event = event;
+    }
+
+    public MessageEvent getEvent() {
+        return event;
     }
 
     public String getToken() {
@@ -41,23 +45,19 @@ public class SlackMessage {
         return type;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals(Object that) {
+        return EqualsBuilder.reflectionEquals(this, that);
     }
 
-    public void setChallenge(String challenge) {
-        this.challenge = challenge;
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
+    @Override
     public String toString() {
-        return "SlackMessage { \n" +
-                "   type: " + this.type + "\n" +
-                "   challenge: " + this.challenge + "\n" +
-                "   token: " + this.token + "\n" +
-                "}";
+        return ToStringBuilder.reflectionToString(this);
     }
 }
