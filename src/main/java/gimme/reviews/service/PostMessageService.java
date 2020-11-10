@@ -13,7 +13,7 @@ import java.io.IOException;
 @Service
 public class PostMessageService {
 
-    private String token = "xoxb-1467349419936-1452029906275-K8JvcSs016XLwskPxkiPP6Rl";
+    private String token = "something";
 
     public void sendResponseMessage(String errorMessage)  {
 
